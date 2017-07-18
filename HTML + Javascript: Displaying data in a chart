@@ -1,0 +1,109 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Scatter Chart</title>
+    <script src="../../../dist/Chart.bundle.js"></script>
+    <script src="../../utils.js"></script>
+    <style>
+    canvas {
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+    }
+    </style>
+</head>
+
+<body>
+    <div style="width:75%">
+        <canvas id="canvas"></canvas>
+    </div>
+    <button id="addData">Update</button>
+    <script>
+
+        var points = [];
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+//-----------------------------------------------------------------------------------------------//
+
+        var color = Chart.helpers.color;
+        var scatterChartData = {
+            datasets: [{
+                label: "My First dataset",
+                borderColor: window.chartColors.red,
+                backgroundColor: color(window.chartColors.red).alpha(0.2).rgbString(),
+                data:  points,
+                fill: false,
+                showLine: false
+            }]
+        };
+
+        window.onload = function() {
+            var ctx = document.getElementById("canvas").getContext("2d"); //drawing the scatter plot
+            window.myScatter = Chart.Scatter(ctx, {
+                data: scatterChartData,
+                options: {
+                    title: {
+                        display: true,
+                        text: 'Distance Scatter Plot'
+                    },
+                    elements: {
+                        line: {
+                            tension: 0, // disables bezier curves
+                        }
+                    }
+                }
+            });
+        };
+        console.log(points);
+
+        var run = false;
+
+        async function moreData(){
+            while (run = true){
+                fetch('https://sqs.us-east-2.amazonaws.com/189794443393/InternQueue?Action=ReceiveMessage&WaitTimeSeconds=20&VisibilityTimeOut=15&MaxNumberOfMessages=10&AttributeName=SentTimestamp',{
+                    method: "GET",
+                    headers: {"Accepts": "application/json"}
+                })
+                .then(
+                    function(response){
+                        response.text().then(function(data) {  
+                            parser = new DOMParser();
+                            xmlDoc = parser.parseFromString(data,"text/xml");
+                            var newx = xmlDoc.getElementsByTagName("Body");  // gets the body of the message
+                            var newt = xmlDoc.getElementsByTagName("Value"); // gets the timestamp of the message
+
+                            for(var i=0; i<newx.length; i++){
+                                var neweTime = parseInt(newt[i].textContent); //convert timestamp into an integer variable
+                                var newdata = newx[i].textContent;            //convert distance data into string.
+
+                                console.log(neweTime);
+                                newdata = newdata.slice(2,-1); 
+                                console.log("yes");                    //confirms getting rid of R at the end of the data string
+                                newdata = parseInt(newdata);
+                                
+                                if(newdata > 0){
+                                    points.push({x:neweTime, y: newdata});        //pushing new point into existing collection of points on the chart.
+                                }
+
+                                console.log(newdata);
+                                window.myScatter.update();
+                            }            
+                        }); 
+                }).then(function(body) {
+                    console.log('okay');
+                })
+                await sleep(200);
+            }
+        }
+        
+        document.getElementById('addData').addEventListener('click', function() {
+            run = true;
+            moreData();
+        });
+        
+    </script>
+</body>
+</html>
