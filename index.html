@@ -3,8 +3,8 @@
 
 <head>
     <title>Scatter Chart</title>
-    <script src="../../../dist/Chart.bundle.js"></script>
-    <script src="../../utils.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
+
     <style>
     canvas {
         -moz-user-select: none;
@@ -39,8 +39,8 @@
         var scatterChartData = {
             datasets: [{
                 label: "My First dataset",
-                borderColor: window.chartColors.red,
-                backgroundColor: color(window.chartColors.red).alpha(0.2).rgbString(),
+                borderColor: 'rgb(255,0,0)',
+                backgroundColor: color('rgb(255,0,0)').alpha(0.2).rgbString(),
                 data: points,
                 fill: false,
                 showLine: false
