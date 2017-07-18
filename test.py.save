@@ -1,0 +1,25 @@
+import serial
+import sys
+import requests
+import boto3
+
+ser = serial.Serial(
+	port = "/dev/ttyUSB0",
+	baudrate=57600, 
+	parity=serial.PARITY_ODD,
+	stopbits=serial.STOPBITS_ONE,
+	bytesize=serial.EIGHTBITS)
+
+#sqs = boto3.resource("sqs")
+
+#r=requests.get("https://sqs.us-east-2.amazonaws.com/189794443393/InternQueue?Action=SendMessage&MessageBody=ch")
+
+while True:
+	ch= ser.read(size=6)	
+	#print(ch)
+	
+	'''response = sqs.send_message(
+	QueueUrl="https://sqs.us-east-2.amazonaws.com/189794443393/InternQueue",
+	MessageBody = str(ch)
+	)'''
+	r = requests.get("https://sqs.us-east-2.amazonaws.com/189794443393/InternQueue?Action=SendMessage&MessageBody="+str(ch))
