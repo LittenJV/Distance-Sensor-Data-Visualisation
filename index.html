@@ -98,6 +98,7 @@
                             xmlDoc = parser.parseFromString(data,"text/xml");
                             var newx = xmlDoc.getElementsByTagName("Body");  // gets the body of the message
                             var newt = xmlDoc.getElementsByTagName("Value"); // gets the timestamp of the message
+                            var receiptHandle = xmlDoc.getElementsByTagName("ReceiptHandle");
 
                             for(var i=0; i<newx.length; i++){
                                 var neweTime = parseInt(newt[i].textContent); //convert timestamp into an integer variable
@@ -108,7 +109,7 @@
                                 console.log("yes");                    //confirms getting rid of R at the end of the data string
                                 newdata = parseInt(newdata);
                                 
-                                if(newdata > 0 && neweTime > Now()- 3600000){
+                                if(newdata > 0){
                                     points.push({x:neweTime, y: newdata});        //pushing new point into existing collection of points on the chart.
                                 }
 
@@ -119,6 +120,7 @@
                 }).then(function(body) {
                     console.log('okay');
                 })
+               
                 await sleep(20);
             }
         }
